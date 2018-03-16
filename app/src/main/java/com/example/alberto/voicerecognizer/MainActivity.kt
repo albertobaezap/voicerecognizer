@@ -6,16 +6,19 @@ import android.os.Bundle
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
+import android.speech.tts.TextToSpeech
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.TextView
 import com.example.alberto.voicerecognizer.R.id.display_text
+import com.example.alberto.voicerecognizer.R.id.text
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
     lateinit var speechRecognizer: SpeechRecognizer
+    lateinit var textToSpeech: TextToSpeech
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,6 +30,19 @@ class MainActivity : AppCompatActivity() {
         speak_button.setOnClickListener {
             promptSpeechInput()
         }
+
+        textToSpeech = TextToSpeech(applicationContext, TextToSpeech.OnInitListener {
+            if(it != TextToSpeech.ERROR) {
+                textToSpeech.language = Locale.getDefault()
+            }
+        })
+
+        play_button.setOnClickListener {
+            val toSpeak = display_text.text.toString()
+            textToSpeech.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null, "New request")
+        }
+
+
     }
 
     fun promptSpeechInput() {
@@ -83,7 +99,7 @@ class MainActivity : AppCompatActivity() {
                     str += data[i]
                 }
                 Log.v(TAG, "results: " + data.size)
-                display_text.text = str
+                display_text.text = data[0]
             }
         }
     }
